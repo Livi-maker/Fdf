@@ -6,7 +6,7 @@
 /*   By: ldei-sva <ldei-sva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 21:32:34 by ldei-sva          #+#    #+#             */
-/*   Updated: 2024/12/24 04:09:12 by ldei-sva         ###   ########.fr       */
+/*   Updated: 2025/01/15 15:58:40 by ldei-sva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char	*setmemory(char *stack, int len)
 	int		i;
 
 	i = 0;
-	if (stack && len == ft_strlen(stack))
+	if (stack && len == ft_get_strlen(stack))
 	{
 		free (stack);
 		stack = NULL;
@@ -26,7 +26,7 @@ char	*setmemory(char *stack, int len)
 	else if (stack)
 	{
 		temp = stack;
-		stack = malloc ((ft_strlen(stack) + 1) * (sizeof(char)));
+		stack = malloc ((ft_get_strlen(stack) + 1) * (sizeof(char)));
 		while (temp[len])
 		{
 			stack[i] = temp[len];
@@ -39,7 +39,7 @@ char	*setmemory(char *stack, int len)
 	return (stack);
 }
 
-char	*createstr(int index, char *fileread, char *line)
+char	*get_createstr(int index, char *fileread, char *line)
 {
 	int		i;
 
@@ -67,7 +67,7 @@ char	*search_for_newline(char *stack, char *line)
 	index = 0;
 	while (stack[index] != '\n' && stack[index] != '\0')
 		index++;
-	line = createstr(index + 1, stack, line);
+	line = get_createstr(index + 1, stack, line);
 	return (line);
 }
 
@@ -104,6 +104,6 @@ char	*get_next_line(int fd)
 		stack = freestack(stack, fileread);
 	}
 	line = search_for_newline(stack, line);
-	stack = setmemory(stack, ft_strlen(line));
+	stack = setmemory(stack, ft_get_strlen(line));
 	return (free (fileread), line);
 }

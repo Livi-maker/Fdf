@@ -6,7 +6,7 @@
 /*   By: ldei-sva <ldei-sva@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 21:37:23 by ldei-sva          #+#    #+#             */
-/*   Updated: 2024/12/24 04:07:12 by ldei-sva         ###   ########.fr       */
+/*   Updated: 2025/01/15 15:59:40 by ldei-sva         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ char	*freestack(char *stack, char *fileread)
 	char	*temp;
 
 	temp = stack;
-	stack = ft_strjoin(stack, fileread);
+	stack = ft_get_strjoin(stack, fileread);
 	if (temp)
 		free (temp);
 	return (stack);
@@ -39,14 +39,14 @@ int	is_there_newline(char *stack)
 	return (0);
 }
 
-char	*ft_strjoin(char *stack, char *fileread)
+char	*ft_get_strjoin(char *stack, char *fileread)
 {
 	char	*temp;
 	int		size;
 	int		i;
 	int		i2;
 
-	size = ft_strlen(stack) + ft_strlen(fileread);
+	size = ft_get_strlen(stack) + ft_get_strlen(fileread);
 	i = 0;
 	i2 = 0;
 	temp = malloc ((size + 1) * (sizeof(char)));
@@ -65,7 +65,7 @@ char	*ft_strjoin(char *stack, char *fileread)
 	return (temp);
 }
 
-int	ft_strlen(char *str)
+int	ft_get_strlen(char *str)
 {
 	int	i;
 
