@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fdf_utils.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ldei-sva <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/25 19:23:51 by ldei-sva          #+#    #+#             */
+/*   Updated: 2025/02/25 19:23:53 by ldei-sva         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "fdf.h"
 
-void	print_map(t_coordinate **map)
+void	print_map(t_node **map)
 {
 	while (*map)
 	{
@@ -9,7 +21,7 @@ void	print_map(t_coordinate **map)
 	}
 }
 
-int	get_lenline(t_coordinate *map)
+int	get_lenline(t_node *map)
 {
 	int				d;
 
@@ -22,11 +34,11 @@ int	get_lenline(t_coordinate *map)
 	return (d);
 }
 
-t_coordinate	*get_nextnode(t_coordinate *map, int len)
+t_node	*get_nextnode(t_node *map, int len)
 {
 	while (len >= 0)
 	{
-		if  (map->next == NULL)
+		if (map->next == NULL)
 			return (NULL);
 		map = map -> next;
 		len--;
@@ -34,10 +46,10 @@ t_coordinate	*get_nextnode(t_coordinate *map, int len)
 	return (map);
 }
 
-int	get_position(t_coordinate *node, t_coordinate **map)
+int	get_position(t_node *node, t_node **map)
 {
 	int				index;
-	t_coordinate	*copy;
+	t_node			*copy;
 
 	index = 0;
 	copy = *map;
@@ -47,4 +59,13 @@ int	get_position(t_coordinate *node, t_coordinate **map)
 		copy = copy -> next;
 	}
 	return (index);
+}
+
+void	increase_xy(int dx, int dy, int *v, int *p)
+{
+	if (dx > 0)
+		*v += 1;
+	else
+		*v -= 1;
+	*p = *p + 2 * abs(dx) - 2 * abs(dy);
 }

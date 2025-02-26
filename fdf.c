@@ -1,133 +1,62 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fdf.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ldei-sva <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/25 19:15:11 by ldei-sva          #+#    #+#             */
+/*   Updated: 2025/02/25 19:15:12 by ldei-sva         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "fdf.h"
 
-void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
+void	my_pixel_put(t_data *data, int x, int y, int z)
 {
 	char	*dst;
 
-	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
-	*(unsigned int*)dst = color;
-}
-
-int	find_y(int x, t_coordinate *node, t_coordinate *nextnode)
-{
-	float	parameter;
-	int		y;
-
-	parameter = ((float)x - (float)node->x)/((float)nextnode->x - (float)node->x);
-	parameter = parameter * ((float)nextnode->y - (float)node->y) + (float)node->y;
-	y = parameter;
-	return (y);
-}
-
-int	find_x(int y, t_coordinate *node, t_coordinate *nextnode)
-{
-	float	parameter;
-	int	x;
-
-	parameter = ((float)y - (float)node->y)/((float)nextnode->y - (float)node->y);
-	parameter = parameter * ((float)nextnode->x - (float)node->x) + (float)node->x;
-	x = parameter;
-	return (x);
-}
-
-void	draw_vertical(t_coordinate *node, t_data img, int len, t_parameters *parameters)
-{
-
-	t_coordinate	*nextnode;
-	int				x;
-	int				y;
-
-	x = node -> x;
-	y = node -> y;
-	nextnode = get_nextnode(node, len);
-	if (!nextnode)
-		return ;
-	while (y != nextnode -> y)
+	if (x <= 1920 && y <= 1080 && x >= 0 && y >= 0)
 	{
-		my_mlx_pixel_put(&img, x + parameters->x, y + parameters->y, 0x0000FF);
-		if (x == nextnode -> x)
-		{
-			y++;
-		}
-		else
-		{
-			if (x < nextnode -> x)
-				x++;
-			else if (x > nextnode -> x)
-				x--;
-			y = find_y(x, node, nextnode);
-		}
-
+		dst = data->addr + (y * data->lenght + x * (data->bits_per_pixel / 8));
+		*(unsigned int *)dst = decide_color(z);
 	}
 }
 
-void	draw_horizontal(t_coordinate *node, t_coordinate *nextnode, t_data img, t_parameters *parameters)
-{
-	int	x;
-	int	y;
-
-	if (!nextnode)
-		return ;
-	x = node->x;
-	y = node->y;
-	while (x != nextnode -> x)
-	{
-		my_mlx_pixel_put(&img, x + parameters->x, y + parameters->y, 0x0000FF);
-		if (y == nextnode -> y)
-		{
-			x++;
-		}
-		else
-		{
-			if (y < nextnode -> y)
-				y++;
-			else if (y > nextnode -> y)
-				y--;
-			x = find_x(y, node, nextnode);
-		}
-	}
-}
-
-void	create_window(t_coordinate **map, int len, t_parameters *parameters)
+void	create_window(t_node *map, int len, t_info *info)
 {
 	void			*mlx;
-	t_coordinate	new;
+	t_node			new;
 	t_data			img;
 	int				r;
-	t_coordinate	**copy;
 
-	copy = map;
 	r = len;
 	mlx = mlx_init();
-	img.win = mlx_new_window(mlx, 1920, 1080, "Hello world!");
+	img.win = mlx_new_window(mlx, 1920, 1080, "Fdf");
 	img.img = mlx_new_image(mlx, 1920, 1080);
-	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
-	mlx_key_hook(img.win, key_hook, parameters);
-	while (*map && r >= 0)
-	{
-		draw_vertical(*map, img, len, parameters);
-		if (r > 0)
-			draw_horizontal(*map, (*map)->next, img, parameters);
-		(*map) = (*map)-> next;
-		if (r == 0)
-			r = len;
-		else
-			r--;
-	}
-	mlx_put_image_to_window(mlx, img.win, img.img, 0, 0);
+	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, \
+	&img.lenght, &img.endian);
+	info->img = &img;
+	info->mlx = mlx;
+	draw_image(img, map, info, mlx);
+	mlx_mouse_hook(img.win, mouse_hook, info);
+	mlx_hook(img.win, 17, 0L, free_all, info);
+	mlx_hook(img.win, 2, 1L << 0, key_hook, info);
 	mlx_loop(mlx);
 }
 
 int	main(int ac, char **av)
 {
-	t_coordinate	**map;
-	int				len;
-	t_parameters	*parameters;
+	t_node	**map;
+	int		len;
+	t_info	*info;
 
-	parameters = malloc(sizeof(t_parameters));
-	map = get_data(av[1]);
+	info = malloc(sizeof(t_info));
+	map = get_data(av[1], info);
 	len = get_lenline(*map);
-	set_parameters(parameters);
-	update_map(*map);
-	create_window(map, len, parameters);
+	print_instructions();
+	set_info(info, map, NULL, len);
+	update_map(info);
+	create_window(*map, len, info);
+	free_all(info);
 }
